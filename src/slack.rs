@@ -28,7 +28,14 @@ async fn post_notification(
     restart_info: &message::ContainerRestartInfo,
 ) -> anyhow::Result<()> {
     let file_url = upload_log_file(slack, slack_token, restart_info).await?;
-    post_message(slack, slack_token, &restart_info.channel, restart_info, &file_url).await
+    post_message(
+        slack,
+        slack_token,
+        &restart_info.channel,
+        restart_info,
+        &file_url,
+    )
+    .await
 }
 
 async fn upload_log_file(
@@ -47,8 +54,18 @@ async fn upload_log_file(
         &restart_info.container_name
     );
 
-    let params = [("content", log), ("filename", &title), ("filetype", "text"), ("title", &title)];
-    let resp = slack.post(UPLOAD_FILE_URL).bearer_auth(slack_token).form(&params).send().await?;
+    let params = [
+        ("content", log),
+        ("filename", &title),
+        ("filetype", "text"),
+        ("title", &title),
+    ];
+    let resp = slack
+        .post(UPLOAD_FILE_URL)
+        .bearer_auth(slack_token)
+        .form(&params)
+        .send()
+        .await?;
     let resp = parse_slack_response(resp).await?;
     let file_url =
         get_file_url_from_response(&resp).context("Failed to get file URL from response")?;
@@ -67,7 +84,12 @@ async fn post_message(
         "blocks": restart_info.to_message(file_url),
         "unfurl_links": false,
     });
-    let resp = slack.post(POST_MESSAGE_URL).bearer_auth(slack_token).json(&message).send().await?;
+    let resp = slack
+        .post(POST_MESSAGE_URL)
+        .bearer_auth(slack_token)
+        .json(&message)
+        .send()
+        .await?;
     parse_slack_response(resp).await?;
     Ok(())
 }

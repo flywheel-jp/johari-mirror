@@ -84,18 +84,33 @@ fn build_container_stats(
     restart_count: i32,
     state: &Option<ContainerState>,
 ) -> Vec<serde_json::Value> {
-    let mut container_stats = vec![markdown_text(&format!("Restart Count: `{}`", restart_count))];
+    let mut container_stats = vec![markdown_text(&format!(
+        "Restart Count: `{}`",
+        restart_count
+    ))];
     if let Some(state) = state {
         container_stats.push(markdown_text(" ")); // alignment
         container_stats.push(markdown_text(&format!("Exit Code: `{}`", state.exit_code)));
-        let signal = state.signal.map_or_else(|| "none".to_owned(), |s| format!("`{}`", s));
+        let signal = state
+            .signal
+            .map_or_else(|| "none".to_owned(), |s| format!("`{}`", s));
         container_stats.push(markdown_text(&format!("Signal: {}", signal)));
-        container_stats.push(markdown_text(&format!("Reason: {}", format_name(&state.reason))));
-        container_stats.push(markdown_text(&format!("Message: {}", format_name(&state.message))));
-        container_stats
-            .push(markdown_text(&format!("Started at: {}", format_name(&state.started_at))));
-        container_stats
-            .push(markdown_text(&format!("Finished at: {}", format_name(&state.finished_at))));
+        container_stats.push(markdown_text(&format!(
+            "Reason: {}",
+            format_name(&state.reason)
+        )));
+        container_stats.push(markdown_text(&format!(
+            "Message: {}",
+            format_name(&state.message)
+        )));
+        container_stats.push(markdown_text(&format!(
+            "Started at: {}",
+            format_name(&state.started_at)
+        )));
+        container_stats.push(markdown_text(&format!(
+            "Finished at: {}",
+            format_name(&state.finished_at)
+        )));
     }
     container_stats
 }
@@ -162,7 +177,11 @@ impl ContainerLog {
     /// - last `LOG_SUMMARY_LINES` lines
     /// - last `LOG_SUMMARY_CHARS` characters
     fn tail_lines(log: &str) -> String {
-        let mut lines = log.lines().rev().take(LOG_SUMMARY_LINES).collect::<Vec<_>>();
+        let mut lines = log
+            .lines()
+            .rev()
+            .take(LOG_SUMMARY_LINES)
+            .collect::<Vec<_>>();
         lines.reverse();
         suffix(&lines.join("\n"), LOG_SUMMARY_CHARS).to_owned()
     }
