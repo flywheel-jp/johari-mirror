@@ -11,7 +11,14 @@ TODO
 
 ## Installation
 
-TODO
+You can use [example.yaml](deployment/example.yaml) to deploy johari-mirror to your
+Kubernetes cluster with `NAMESPACE` and `NOTIFICATION_CHANNEL` replaced.
+
+```sh
+kubectl create secret generic johari-mirror-slack-api-token \
+  --from-literarl=token=<your-slack-token>
+kubectl apply -f example.yaml
+```
 
 ### Environment variables
 
