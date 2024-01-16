@@ -16,7 +16,7 @@ Kubernetes cluster with `NAMESPACE` and `NOTIFICATION_CHANNEL` replaced.
 
 ```sh
 kubectl create secret generic johari-mirror-slack-api-token \
-  --from-literarl=token=<your-slack-token>
+  --from-literal=token=<your-slack-token>
 kubectl apply -f example.yaml
 ```
 
