@@ -31,9 +31,30 @@ All environment variables are required.
 
 #### SLACK_NOTIFICATION_CONFIG
 
+`SLACK_NOTIFICATION_CONFIG` environment variable defines a list of rules to configure
+notification destination delimited by commas in
+`namespace/pod/container=channel,...,namespace/pod/container=channel` format.
+
+- When a container restart is detected, johari-mirror determines the Slack channel
+  to send notification by its `namespace`, `pod` name and `container` name.
+- Earlier rules have higher priority.
+- Each of `namespace`, `pod` or `container` in a rule may contain `*` wildcards.
+- `channel` can be either of a Slack channel name, a Slack channel ID or
+  an empty string. Empty string suppresses notification.
+
+Examples
+
+- `*/*/*=monitoring`
+  - Any container restarts are notified to `monitoring` Slack channel.
+- `kube-system/coredns-*/*=monitoring-coredns,kube-system/*/*=,*/*/*=monitoring`
+  - Restarts of pods beginning with `coredns-` in `kube-system` namespace are notified
+    to `monitoring-coredns` channel.
+  - Restarts of other pods in `kube-system` namespace are not notified.
+  - Restarts in the other namespaces are notified to `monitoring` channel.
+
 ### Slack authentication
 
-[Quickstart | Slack](https://api.slack.com/start/quickstart)
+Ref: [Quickstart | Slack](https://api.slack.com/start/quickstart)
 
 Create a Slack App and install it to your workspace.
 johari-mirror uses
@@ -51,9 +72,10 @@ in the environment variable `SLACK_TOKEN`.
 
 Kubernetes authentication can be obtained from `KUBECONFIG`, `~/.kube/config` or
 in-cluster config.
-cf. [Config in kube - Rust](https://docs.rs/kube/latest/kube/struct.Config.html#method.infer)
 
-See example manifest.
+Ref. [Config in kube - Rust](https://docs.rs/kube/latest/kube/struct.Config.html#method.infer)
+
+See [example manifest](deployment/example.yaml) for authentication using ServiceAccount.
 
 #### Required permissions
 
