@@ -208,6 +208,7 @@ async fn describe_container_status(
         pod_name: p.name_any(),
         container_name: container.name.clone(),
         container_image: container.image.clone(),
+        node_name: p.spec.as_ref().and_then(|s| s.node_name.clone()),
         restart_count: container.restart_count,
         last_state: get_last_state(container),
         resources: get_resources(p, container).unwrap_or_default(),

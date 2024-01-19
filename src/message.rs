@@ -17,6 +17,7 @@ pub struct ContainerRestartInfo {
     pub pod_name: String,
     pub container_name: String,
     pub container_image: String,
+    pub node_name: Option<String>,
     pub restart_count: i32,
     pub last_state: Option<ContainerState>,
     pub resources: ContainerResources,
@@ -30,11 +31,13 @@ impl ContainerRestartInfo {
             r"Namespace: {}
 Pod: `{}`
 Container Name: `{}`
-Container Image: `{}`",
+Container Image: `{}`
+Node Name: {}",
             format_name(&self.namespace),
             &self.pod_name,
             &self.container_name,
             &self.container_image,
+            format_name(&self.node_name),
         );
         let stats = build_container_stats(self.restart_count, &self.last_state);
         let resources = self.resources.to_message();
