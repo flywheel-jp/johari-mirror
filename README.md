@@ -7,7 +7,10 @@ notify restart reasons and logs to Slack.
 
 ## Overview
 
-TODO
+johari-mirror collects information about restarted containers and post notifications
+to Slack like following.
+
+![Example Slack notification](docs/example-notification.png)
 
 ## Installation
 
