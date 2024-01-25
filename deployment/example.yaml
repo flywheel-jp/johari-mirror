@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: johari-mirror
+  name: johari-mirror
+  namespace: NAMESPACE
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: johari-mirror
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations: {}
+      labels:
+        app: johari-mirror
+    spec:
+      automountServiceAccountToken: true
+      containers:
+        - args: []
+          env:
+            - name: SLACK_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: token
+                  name: johari-mirror-slack-api-token
+            - name: SLACK_NOTIFICATION_CONFIG
+              value: '*/*/*=NOTIFICATION_CHANNEL'
+          image: TODO
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - sleep
+                  - '20'
+          name: johari-mirror
+          resources:
+            limits:
+              memory: 500Mi
+            requests:
+              cpu: 50m
+              memory: 500Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              add: []
+              drop:
+                - all
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+      initContainers: []
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: johari-mirror
+      terminationGracePeriodSeconds: 60
+      volumes: []
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: johari-mirror
+  namespace: NAMESPACE
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: johari-mirror
+rules:
+  - apiGroups:
+      - ''
+    resources:
+      - pods
+      - pods/log
+    verbs:
+      - get
+      - watch
+      - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: johari-mirror
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: johari-mirror
+subjects:
+  - kind: ServiceAccount
+    name: johari-mirror
+    namespace: NAMESPACE
