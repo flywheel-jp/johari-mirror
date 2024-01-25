@@ -1,9 +1,13 @@
 name: docker-build
 
 on:
-  pull_request:
-    branches:
-      - main
+  push:
+    tags:
+      - 'v*'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE: ${{ github.repository }}
 
 jobs:
   build:
@@ -12,9 +16,19 @@ jobs:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: false
-          tags: ${{ github.repository }}:latest
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
