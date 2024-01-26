@@ -1,9 +1,8 @@
 name: docker-build
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
   workflow_dispatch:
 
 env:
