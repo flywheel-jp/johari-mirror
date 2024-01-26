@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - 'v*'
-    branches:
-      - docker-build
   workflow_dispatch:
 
 env:
