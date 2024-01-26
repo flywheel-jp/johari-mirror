@@ -32,7 +32,7 @@ spec:
                   name: johari-mirror-slack-api-token
             - name: SLACK_NOTIFICATION_CONFIG
               value: '*/*/*=NOTIFICATION_CHANNEL'
-          image: TODO
+          image: ghcr.io/flywheel-jp/johari-mirror:latest
           lifecycle:
             preStop:
               exec:
