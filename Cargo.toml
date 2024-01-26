@@ -12,7 +12,7 @@ futures = "0.3.29"
 k8s-openapi = { version = "0.20.0", features = ["v1_24"] }
 kube = { version = "0.87.1", features = ["runtime"] }
 log = "0.4.20"
-reqwest = { version = "0.11.22", features = ["json"] }
+reqwest = { version = "0.11.22", default-features = false, features = ["json", "rustls-tls"] }
 serde_json = "1.0.108"
 tokio = { version = "1.35.0", features = ["macros", "rt-multi-thread"] }
 wildmatch = "2.1.1"
