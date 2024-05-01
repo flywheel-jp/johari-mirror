@@ -1,10 +1,12 @@
 use anyhow::{bail, Context};
+use serde_json::json;
 use tokio::sync::mpsc;
 
 use crate::message;
 
 const POST_MESSAGE_URL: &str = "https://slack.com/api/chat.postMessage";
-const UPLOAD_FILE_URL: &str = "https://slack.com/api/files.upload";
+const GET_UPLOAD_URL: &str = "https://slack.com/api/files.getUploadURLExternal";
+const COMPLETE_UPLOAD_URL: &str = "https://slack.com/api/files.completeUploadExternal";
 
 /// Task to send messages to Slack channel
 pub async fn slack_send(
@@ -44,7 +46,7 @@ async fn upload_log_file(
     restart_info: &message::ContainerRestartInfo,
 ) -> anyhow::Result<Option<String>> {
     let log = match restart_info.logs.0.as_ref().map(|log| log.trim_end()) {
-        Ok(log) if !log.is_empty() => log,
+        Ok(log) if !log.is_empty() => log.to_owned(),
         _empty_or_error => return Ok(None),
     };
     let title = format!(
@@ -54,21 +56,52 @@ async fn upload_log_file(
         &restart_info.container_name
     );
 
+    let length = log.len().to_string();
     let params = [
-        ("content", log),
+        ("snippet_type", "text"),
+        ("length", &length),
         ("filename", &title),
-        ("filetype", "text"),
-        ("title", &title),
     ];
     let resp = slack
-        .post(UPLOAD_FILE_URL)
+        .post(GET_UPLOAD_URL)
         .bearer_auth(slack_token)
         .form(&params)
         .send()
         .await?;
     let resp = parse_slack_response(resp).await?;
-    let file_url =
-        get_file_url_from_response(&resp).context("Failed to get file URL from response")?;
+    let upload_url = resp
+        .get("upload_url")
+        .and_then(|url| url.as_str())
+        .context("Failed to get upload URL")?;
+    let file_id = resp
+        .get("file_id")
+        .and_then(|id| id.as_str())
+        .context("Failed to get file ID")?;
+
+    slack
+        .post(upload_url)
+        .body(log)
+        .send()
+        .await?
+        .error_for_status()?;
+
+    let resp = slack
+        .post(COMPLETE_UPLOAD_URL)
+        .bearer_auth(slack_token)
+        .json(&json!({
+            "files": [
+                {
+                    "id": file_id,
+                    "title": &title,
+                },
+            ],
+        }))
+        .send()
+        .await?
+        .error_for_status()?;
+    let resp = parse_slack_response(resp).await?;
+    let file_url = get_file_url_from_response(&resp).context("Failed to get file URL")?;
+
     Ok(Some(file_url.to_owned()))
 }
 
@@ -97,7 +130,7 @@ async fn post_message(
 async fn parse_slack_response(resp: reqwest::Response) -> anyhow::Result<serde_json::Value> {
     if !resp.status().is_success() {
         bail!(
-            "Failed to post message to Slack: {}",
+            "Slack API failed: {}",
             resp.text().await.unwrap_or_else(|err| err.to_string())
         );
     }
@@ -114,5 +147,5 @@ async fn parse_slack_response(resp: reqwest::Response) -> anyhow::Result<serde_j
 }
 
 fn get_file_url_from_response(resp: &serde_json::Value) -> Option<&str> {
-    resp.get("file")?.get("permalink")?.as_str()
+    resp.get("files")?.get(0)?.get("permalink")?.as_str()
 }
