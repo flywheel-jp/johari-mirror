@@ -173,7 +173,7 @@ fn containers(p: &Pod) -> impl Iterator<Item = &ContainerStatus> {
 /// Helper struct to display Pod by namespace and name
 struct PodDisplay<'a>(&'a Pod);
 
-impl<'a> Display for PodDisplay<'a> {
+impl Display for PodDisplay<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}/{}", self.0.namespace().unwrap(), self.0.name_any(),)
     }
