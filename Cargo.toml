@@ -7,13 +7,16 @@ license = "MIT"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.75"
-env_logger = "0.11.0"
-futures = "0.3.29"
-k8s-openapi = { version = "0.21.0", features = ["v1_25"] }
-kube = { version = "0.88.1", features = ["runtime"] }
-log = "0.4.20"
-reqwest = { version = "0.11.22", default-features = false, features = ["json", "rustls-tls"] }
-serde_json = "1.0.108"
-tokio = { version = "1.35.0", features = ["macros", "rt-multi-thread"] }
-wildmatch = "2.1.1"
+anyhow = "1.0.95"
+env_logger = "0.11.6"
+futures = "0.3.31"
+k8s-openapi = { version = "0.24.0", features = ["v1_32"] }
+kube = { version = "0.98.0", features = ["runtime"] }
+log = "0.4.25"
+reqwest = { version = "0.12.12", default-features = false, features = [
+    "json",
+    "rustls-tls",
+] }
+serde_json = "1.0.138"
+tokio = { version = "1.43.0", features = ["macros", "rt-multi-thread"] }
+wildmatch = "2.4.0"

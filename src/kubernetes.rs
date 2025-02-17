@@ -60,7 +60,7 @@ pub async fn watch(
         match e {
             // Pod `p` was added or modified.
             // Note that a container restart is treated as a modification of pod status.
-            watcher::Event::Applied(p) => {
+            watcher::Event::Apply(p) => {
                 process_applied(
                     &mut pod_restart_count,
                     &notification_config,
@@ -71,19 +71,20 @@ pub async fn watch(
                 .await?;
             }
             // Pod `p` was terminated successfully.
-            watcher::Event::Deleted(p) => {
+            watcher::Event::Delete(p) => {
                 log::info!("Pod deleted: {}", PodDisplay(&p));
                 pod_restart_count.remove(&p.uid().unwrap());
             }
             // `watcher` was initialized or restarted.
-            // Register all living pods in `pod_restart_count`.
-            watcher::Event::Restarted(living_pods) => {
+            watcher::Event::Init => {
                 pod_restart_count.clear();
-                for p in living_pods {
-                    log::info!("Pod detected: {}", PodDisplay(&p));
-                    pod_restart_count.insert(p.uid().unwrap(), restarts_in_pod(&p));
-                }
             }
+            // Register all living pods in `pod_restart_count`.
+            watcher::Event::InitApply(p) => {
+                log::info!("Pod detected: {}", PodDisplay(&p));
+                pod_restart_count.insert(p.uid().unwrap(), restarts_in_pod(&p));
+            }
+            watcher::Event::InitDone => (),
         }
     }
 
@@ -172,7 +173,7 @@ fn containers(p: &Pod) -> impl Iterator<Item = &ContainerStatus> {
 /// Helper struct to display Pod by namespace and name
 struct PodDisplay<'a>(&'a Pod);
 
-impl<'a> Display for PodDisplay<'a> {
+impl Display for PodDisplay<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}/{}", self.0.namespace().unwrap(), self.0.name_any(),)
     }
