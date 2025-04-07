@@ -6,11 +6,11 @@ jobs:
   clippy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
-      - uses: giraffate/clippy-action@v1
+      - uses: giraffate/clippy-action@13b9d32482f25d29ead141b79e7e04e7900281e0 # v1.0.1
         with:
           reporter: github-pr-review
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -18,7 +18,7 @@ jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
