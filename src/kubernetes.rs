@@ -225,8 +225,8 @@ fn get_last_state(container: &ContainerStatus) -> Option<message::ContainerState
         signal: state.signal,
         reason: state.reason.clone(),
         message: state.message.clone(),
-        started_at: state.started_at.as_ref().map(|t| t.0.to_rfc3339()),
-        finished_at: state.finished_at.as_ref().map(|t| t.0.to_rfc3339()),
+        started_at: state.started_at.as_ref().map(|t| t.0.to_string()),
+        finished_at: state.finished_at.as_ref().map(|t| t.0.to_string()),
     })
 }
 
