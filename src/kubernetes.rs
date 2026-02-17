@@ -1,5 +1,5 @@
 use std::{
-    collections::{hash_map::Entry, HashMap},
+    collections::{HashMap, hash_map::Entry},
     fmt::Display,
 };
 
@@ -7,9 +7,9 @@ use anyhow::Context;
 use futures::StreamExt;
 use k8s_openapi::api::core::v1::{ContainerStatus, Pod};
 use kube::{
+    Client,
     api::{Api, LogParams, ResourceExt},
     runtime::watcher,
-    Client,
 };
 use tokio::sync::mpsc;
 use wildmatch::WildMatch;
