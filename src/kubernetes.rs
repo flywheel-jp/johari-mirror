@@ -1,5 +1,5 @@
 use std::{
-    collections::{hash_map::Entry, HashMap},
+    collections::{HashMap, hash_map::Entry},
     fmt::Display,
 };
 
@@ -7,9 +7,9 @@ use anyhow::Context;
 use futures::StreamExt;
 use k8s_openapi::api::core::v1::{ContainerStatus, Pod};
 use kube::{
+    Client,
     api::{Api, LogParams, ResourceExt},
     runtime::watcher,
-    Client,
 };
 use tokio::sync::mpsc;
 use wildmatch::WildMatch;
@@ -225,8 +225,8 @@ fn get_last_state(container: &ContainerStatus) -> Option<message::ContainerState
         signal: state.signal,
         reason: state.reason.clone(),
         message: state.message.clone(),
-        started_at: state.started_at.as_ref().map(|t| t.0.to_rfc3339()),
-        finished_at: state.finished_at.as_ref().map(|t| t.0.to_rfc3339()),
+        started_at: state.started_at.as_ref().map(|t| t.0.to_string()),
+        finished_at: state.finished_at.as_ref().map(|t| t.0.to_string()),
     })
 }
 
