@@ -34,9 +34,9 @@ Container Name: `{}`
 Container Image: `{}`
 Node Name: {}",
             format_name(&self.namespace),
-            &self.pod_name,
-            &self.container_name,
-            &self.container_image,
+            self.pod_name,
+            self.container_name,
+            self.container_image,
             format_name(&self.node_name),
         );
         let stats = build_container_stats(self.restart_count, &self.last_state);

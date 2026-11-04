@@ -113,7 +113,7 @@ async fn process_applied(
                 log::info!(
                     "Container restarted: {} - {}",
                     PodDisplay(p),
-                    &container.name
+                    container.name
                 );
                 let channel = match notification_config.find_channel(
                     p.namespace().as_deref().unwrap_or(""),
@@ -127,7 +127,7 @@ async fn process_applied(
                         log::debug!(
                             "Skipping notification: {} - {}",
                             PodDisplay(p),
-                            &container.name
+                            container.name
                         );
                         continue;
                     }
