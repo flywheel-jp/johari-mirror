@@ -52,8 +52,8 @@ async fn upload_log_file(
     let title = format!(
         "{}_{}_{}",
         restart_info.namespace.as_ref().unwrap_or(&"".to_owned()),
-        &restart_info.pod_name,
-        &restart_info.container_name
+        restart_info.pod_name,
+        restart_info.container_name
     );
 
     let length = log.len().to_string();
